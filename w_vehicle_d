@@ -1,0 +1,29 @@
+select a.group_code as 车系编码,
+       a.group_name as 车系,
+       b.group_code as 车型编码,
+       b.group_name as 车型,
+       nvl(c.group_code,b.group_code) as 状态编码,
+       nvl(c.group_name,b.group_name) as 状态,
+       e.color_code as 颜色编码,
+       e.color_name as 颜色,
+       e.material_code as 整车编码,
+       e.material_name as 整车                   
+from mv_tm_vhcl_material_group a
+join mv_tm_org o
+  on a.COMPANY_ID = o.ORG_ID
+ and o.DUTY_TYPE = 10431001
+join mv_tm_vhcl_material_group b
+  on a.group_id=b.parent_group_id
+ and b.status=10011001 
+left join mv_tm_vhcl_material_group c
+       on b.group_id = c.parent_group_id
+      and c.status = 10011001 
+left join mv_vhcl_material_group_r d
+       on c.group_id=d.group_id  
+join mv_tm_vhcl_material e
+       on e.material_id=d.material_id 
+      and e.status=10011001      
+where a.group_level=2
+  --and a.group_name='杰勋' --该条件用于检查数据条数是否正确
+  and a.status = 10011001
+  and o.DUTY_TYPE = 10431001;
